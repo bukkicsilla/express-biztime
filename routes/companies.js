@@ -46,7 +46,7 @@ router.post("/", async function (req, res, next) {
   }
 });
 
-router.patch("/:code", async function (req, res, next) {
+router.put("/:code", async function (req, res, next) {
   try {
     const { code } = req.params;
     const { name, description } = req.body;
