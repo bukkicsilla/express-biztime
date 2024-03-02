@@ -82,7 +82,7 @@ router.delete("/:code", async function (req, res, next) {
       //notFoundError.status = 404;
       throw notFoundError;
     }
-    return res.json({ msg: "deleted" });
+    return res.json({ status: "deleted" });
   } catch (e) {
     return next(e);
   }
