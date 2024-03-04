@@ -67,7 +67,7 @@ router.post("/", async function (req, res, next) {
       [comp_code, amt]
     );
 
-    return res.json({ invoice: results.rows[0] });
+    return res.status(201).json({ invoice: results.rows[0] });
   } catch (err) {
     return next(err);
   }
