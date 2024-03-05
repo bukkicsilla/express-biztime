@@ -13,7 +13,7 @@ router.get("/", async function (req, res, next) {
   }
 });
 
-router.get("/:code", async function (req, res, next) {
+/*router.get("/:code", async function (req, res, next) {
   try {
     const results = await db.query(
       "SELECT code, name, description FROM companies WHERE code = $1",
@@ -31,6 +31,34 @@ router.get("/:code", async function (req, res, next) {
     return res.json({ company: results.rows[0] });
   } catch (err) {
     return next(err);
+  }
+});*/
+
+router.get("/:code", async function (req, res, next) {
+  try {
+    const results = await db.query(
+      `SELECT c.code, c.name, c.description, i.industry FROM companies AS c 
+      LEFT JOIN company_industries AS ci ON c.code = ci.comp_code 
+      LEFT JOIN industries AS i ON ci.ind_code = i.code WHERE c.code = $1`,
+      [req.params.code]
+    );
+    const invResults = await db.query(
+      `SELECT * FROM invoices WHERE comp_code = $1`,
+      [req.params.code]
+    );
+
+    if (results.rows.length === 0) {
+      throw new ExpressError(
+        `There is no company with this code '${req.params.code}`,
+        404
+      );
+    }
+    let { code, name, description } = results.rows[0];
+    let industries = results.rows.map((r) => r.industry);
+    let invoices = invResults.rows;
+    return res.json({ code, name, description, invoices, industries });
+  } catch (e) {
+    return next(e);
   }
 });
 
