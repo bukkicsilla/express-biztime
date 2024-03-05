@@ -48,4 +48,26 @@ router.post("/", async function (req, res, next) {
   }
 });
 
+router.post("/:indcode/company/:compcode", async function (req, res, next) {
+  try {
+    const { indcode, compcode } = req.params;
+    const indResults = await db.query(
+      `SELECT * FROM industries WHERE code = $1`,
+      [indcode]
+    );
+    if (indResults.rows.length === 0) {
+      throw new ExpressError(`There is no industry code with ${indCode}`, 404);
+    }
+    const results = await db.query(
+      `INSERT INTO company_industries (comp_code, ind_code) VALUES ($1, $2) RETURNING *`,
+      [compcode, indcode]
+    );
+
+    return res.status(201).json({
+      result: results.rows[0],
+    });
+  } catch (e) {
+    return next(e);
+  }
+});
 module.exports = router;
